@@ -4,7 +4,7 @@
 </template>
 
 <script setup>
-import {ref} from "vue";
+import {ref, unref} from "vue";
 
 const props = defineProps({
   x: {
@@ -20,36 +20,35 @@ const props = defineProps({
 		required: true
 	},
 })
-const value = ref(0);
+const val = ref(0);
 
-const emit = defineEmits(['clicked'])
+const emit = defineEmits(['update'])
 const getClass = () => {
-	if (value.value === 1) {
+	if (val.value === 1) {
 		return "tile__filled"
-  } else if (value.value === 0) {
+  } else if (val.value === 0) {
 		return "tile__empty"
-  } else if (value.value === 2) {
+  } else if (val.value === 2) {
 		return "tile__checked"
   }
 }
 
 const leftClick = () => {
-	console.log(value.value)
-	if (value.value === 1) {
-		value.value = 0
-	} else if (value.value === 0) {
-		value.value = 1
-	} else value.value = 1
-	emit('clicked', props.id, value)
+	if (val.value === 1) {
+		val.value = 0
+	} else if (val.value === 0) {
+		val.value = 1
+	} else val.value = 1
+	emit('update', props.x, props.y, unref(val))
 }
 
 const rightClick = () => {
-	if (value.value === 2) {
-		value.value = 0
+	if (val.value === 2) {
+		val.value = 0
 	} else {
-		value.value = 2
+		val.value = 2
 	}
-	emit('clicked', props.id, value)
+	emit('clicked', props.id, val)
 }
 </script>
 

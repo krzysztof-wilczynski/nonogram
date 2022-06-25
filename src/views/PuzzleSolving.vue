@@ -15,8 +15,12 @@
     <div class="puzzle__bottom">
       <div class="puzzle__bottom__numbers">
         <div
-            v-for="(row, index) in puzzle.numbers.rows" :key="index" class="puzzle__bottom__numbers__row">
-          <div v-for="(number, _index) in row" :key="_index" class="puzzle__number">
+            v-for="(row, index) in puzzle.numbers.rows" :id="`row-${index + 1}`"
+            :key="index"
+            class="puzzle__bottom__numbers__row">
+          <div
+              v-for="(number, _index) in row" :id="`row-${index + 1}_tile-${_index + 1}`" :key="_index"
+              class="puzzle__number">
             {{ number }}
           </div>
         </div>
@@ -24,7 +28,7 @@
       <div class="puzzle__bottom__image">
         <div v-for="y in puzzle.image.height" :key="y" class="puzzle__bottom__image__row">
           <div v-for="x in puzzle.image.width" :key="x">
-            <PuzzleTile :x="x" :y="y" :correct="puzzle.getValueByCoords(x, y)"/>
+            <PuzzleTile :x="x" :y="y" :correct="puzzle.getValueByCoords(x, y)" @update="Puzzle.changeValue"/>
           </div>
         </div>
       </div>
@@ -41,7 +45,7 @@ class Tile {
 		this.x = x;
 		this.y = y;
 		this.correct = correct;
-		this.value = false
+		this.value = 0
 	}
 }
 
@@ -129,11 +133,31 @@ class Puzzle {
 	}
 
 	getValueByCoords(x, y) {
-		return this.tiles.filter(tile => tile.x === x && tile.y === y).map(tile => tile.correct)[0]
+		return this.tiles.find(tile => tile.x === x && tile.y === y).correct
+	}
+
+	static changeValue(x, y, value) {
+		const tile = puzzle.tiles.find(tile => tile.x === x && tile.y === y)
+		Object.assign(tile, {value})
+		puzzle.checkResult()
+	}
+
+	checkResult() {
+
+		document.getElementById('row-1_tile-1').style.color = 'red'
+
+		const filledTiles = this.tiles.filter(tile => tile.value === 1).length
+		const shouldBeFilled = this.tiles.filter(tile => tile.correct === 1).length
+		console.log(filledTiles, shouldBeFilled)
+		if (filledTiles === shouldBeFilled) {
+			if (this.tiles.filter(tile => tile.value === tile.correct && tile.value === 1).length === shouldBeFilled) {
+				console.log('Win!')
+			}
+		}
 	}
 }
 
-const puzzle = new Puzzle(10, 10, "11001100000011100000011011110001111110000011000000001111100011111111101101111111000100111000110111000")
+const puzzle = new Puzzle(3, 3, "101010101")
 console.log(puzzle);
 
 
